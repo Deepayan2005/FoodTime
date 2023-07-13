@@ -58,4 +58,4 @@ def search_recipes():
         except AttributeError:
             print("sorry")
 
-    return json.dumps(list)
+    return json.dumps({'data':list})
