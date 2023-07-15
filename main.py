@@ -1,64 +1,61 @@
 import json
+
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask
 from flask import request
-from concurrent.futures import ThreadPoolExecutor
-
 
 app = Flask(__name__)
 
 @app.route('/details')
 def give_details():
-    with ThreadPoolExecutor(max_workers=1000) as p:
-        text = str(request.args.get('input'))
-        page = requests.get(text)
-        # Getting page HTML through request
-        soup = BeautifulSoup(page.content, 'html.parser')
-        items = soup.find('div',class_='recipetabsdata ingredients_lilsting clearfix')
+    text = str(request.args.get('input'))
+    page = requests.get(text)
+    # Getting page HTML through request
+    soup = BeautifulSoup(page.content, 'html.parser')
+    items = soup.find('div',class_='recipetabsdata ingredients_lilsting clearfix')
 
-        compo = []
-        steps = []
+    compo = []
+    steps = []
 
-        for name in items.find_all('li',class_='clearfix'):
-            compo.append(name.text)
+    for name in items.find_all('li',class_='clearfix'):
+        compo.append(name.text)
 
-        serving = soup.find('div',class_='servingselect').find('option').text.strip()
+    serving = soup.find('div',class_='servingselect').find('option').text.strip()
 
-        for data in soup.find('div',class_='steps_listings clearfix').find_all('li'):
-            s2 = BeautifulSoup(str(data),'html.parser')
-            steps.append(s2.find('p').text)
+    for data in soup.find('div',class_='steps_listings clearfix').find_all('li'):
+        s2 = BeautifulSoup(str(data),'html.parser')
+        steps.append(s2.find('p').text)
 
-        dict = {'components':compo,'servings':serving,'steps':steps}
+    dict = {'components':compo,'servings':serving,'steps':steps}
 
-        return json.dumps(dict)
+    return json.dumps(dict)
 
 @app.route('/search')
 def search_recipes():
-    with ThreadPoolExecutor(max_workers=1000) as p:
-        text = str(request.args.get('input'))
-        page = requests.get(text)
-        # Getting page HTML through request
-        soup = BeautifulSoup(page.content, 'html.parser')
+    text = str(request.args.get('input'))
+    page = requests.get(text)
+    # Getting page HTML through request
+    soup = BeautifulSoup(page.content, 'html.parser')
 
-        data = soup.find('div', class_='clearfix nomrg recipe_like_listing') \
-            .find_all('div', class_='mustTry_left')
-        list = []
-        for rec in data:
-            try:
-                s2 = BeautifulSoup(str(rec), 'html.parser')
-                link = s2.find('span', class_='posrel').find('a').get('href')
-                image = s2.find('span', class_='posrel').find('a').find('img').get('data-src')
-                name = s2.find('div', class_='caption clearfix').find('h2').text.replace('\n', '')
-                time = s2.find('div', class_='caption clearfix').find('div', class_='nrecipe_vegnonveg') \
-                    .text.replace('\n', '')
-                category = s2.find('div', class_='caption clearfix').find('div', class_='nrecipe_vegnonveg') \
-                    .find('span', class_='vegnonveg').contents[0].__str__().replace('span', "").replace('<', '') \
-                    .replace('>', '').replace('/', '').replace('"', '').replace('class', '').replace('=', '')
-                sen = {"name": name, "image": image, "link": link, "time": time, "category": category}
+    data = soup.find('div', class_='clearfix nomrg recipe_like_listing') \
+        .find_all('div', class_='mustTry_left')
+    list = []
+    for rec in data:
+        try:
+            s2 = BeautifulSoup(str(rec), 'html.parser')
+            link = s2.find('span', class_='posrel').find('a').get('href')
+            image = s2.find('span', class_='posrel').find('a').find('img').get('data-src')
+            name = s2.find('div', class_='caption clearfix').find('h2').text.replace('\n', '')
+            time = s2.find('div', class_='caption clearfix').find('div', class_='nrecipe_vegnonveg') \
+                .text.replace('\n', '')
+            category = s2.find('div', class_='caption clearfix').find('div', class_='nrecipe_vegnonveg') \
+                .find('span', class_='vegnonveg').contents[0].__str__().replace('span', "").replace('<', '') \
+                .replace('>', '').replace('/', '').replace('"', '').replace('class', '').replace('=', '')
+            sen = {"name": name, "image": image, "link": link, "time": time, "category": category}
 
-                list.append(sen)
+            list.append(sen)
 
-            except AttributeError:
-                print("sorry")
-        return json.dumps(list)
+        except AttributeError:
+            print("sorry")
+    return json.dumps(list)
