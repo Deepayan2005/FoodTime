@@ -11,7 +11,6 @@ app = Flask(__name__)
 @app.route('/details')
 def give_details():
     with ThreadPoolExecutor(max_workers=1000) as p:
-        p.map(give_details)
         text = str(request.args.get('input'))
         page = requests.get(text)
         # Getting page HTML through request
@@ -37,7 +36,6 @@ def give_details():
 @app.route('/search')
 def search_recipes():
     with ThreadPoolExecutor(max_workers=1000) as p:
-        p.map(search_recipes)
         text = str(request.args.get('input'))
         page = requests.get(text)
         # Getting page HTML through request
