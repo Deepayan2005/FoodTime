@@ -31,7 +31,7 @@ def give_details():
 
         dict = {'components':compo,'servings':serving,'steps':steps}
 
-    return json.dumps(dict)
+        return json.dumps(dict)
 
 @app.route('/search')
 def search_recipes():
@@ -61,4 +61,4 @@ def search_recipes():
 
             except AttributeError:
                 print("sorry")
-    return json.dumps(list)
+        return json.dumps(list)
