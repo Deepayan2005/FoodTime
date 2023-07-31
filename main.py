@@ -20,6 +20,8 @@ def give_details():
         items = soup.find('div',class_='recipetabsdata ingredients_lilsting clearfix')
 
         compo = []
+        foodName = soup.find("h1", class_="nheadingrs").text
+        imageLink = soup.find("div", class_="lftImg").find("img").get("src")
         steps = []
 
         for name in items.find_all('li',class_='clearfix'):
@@ -31,7 +33,7 @@ def give_details():
             s2 = BeautifulSoup(str(data),'html.parser')
             steps.append(s2.find('p').text)
 
-        dict = {'components':compo,'servings':serving,'steps':steps}
+        dict = {"name": foodName, "image": imageLink, 'components': compo, 'servings': serving, 'steps': steps}
 
         return json.dumps(dict)
 
